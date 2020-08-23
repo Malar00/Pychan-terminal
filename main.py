@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import html2text
 from datetime import datetime
 
 current_board = "g"
@@ -29,13 +30,23 @@ def list_threads():
             thread_list.append(
                 requests.get(
                     'https://a.4cdn.org/' + current_board + '/thread/' + str(thread_number['no']) + '.json'))
+        break
 
     for threads in thread_list:
         for thread in threads.json()['posts']:
-            #if str(thread['com']):
-            print(str(thread['no']) + " | " + str(thread['com']))
-        for width in range(os.get_terminal_size()[0]):
-            print("-", end='')
+            try:
+                print(str(thread['no']))
+            except KeyError:
+                print("no number")
+
+            try:
+                h = html2text.HTML2Text()
+                print(h.handle(thread['com']))
+            except KeyError:
+                print("no com")
+
+            for width in range(os.get_terminal_size()[0]):
+                print("-", end='')
 
 
 def list_boards():
