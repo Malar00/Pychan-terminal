@@ -1,22 +1,63 @@
 import requests
 import json
+import os
+from datetime import datetime
+
+current_board = "g"
 
 
-def get_api():
+def get_boards():
     response = requests.get('https://a.4cdn.org/boards.json')
     response_json = response.json()
-    with open('4chan.json', 'w') as file:
+    with open('4chan_boards.json', 'w') as file:
         json.dump(response_json, file)
 
 
+def get_threads(board):
+    response = requests.get('https://a.4cdn.org/' + board + '/threads.json')
+    response_json = response.json()
+    with open('4chan_threads.json', 'w') as file:
+        json.dump(response_json, file)
+
+
+def list_threads():
+    data = read_json("4chan_threads.json")
+    thread_list = []
+    for threads in data:
+        for thread_number in threads['threads']:
+            print(thread_number['no'])
+            thread_list.append(
+                requests.get(
+                    'https://a.4cdn.org/' + current_board + '/thread/' + str(thread_number['no']) + '.json'))
+
+    for threads in thread_list:
+        for thread in threads.json()['posts']:
+            #if str(thread['com']):
+            print(str(thread['no']) + " | " + str(thread['com']))
+        for width in range(os.get_terminal_size()[0]):
+            print("-", end='')
+
+
 def list_boards():
-    data = read_json()
+    data = read_json("4chan_boards.json")
+    board_number = 0
+    boards_list = []
     for boards in data['boards']:
-        print(boards['meta_description'])
+        boards_list.append(boards['board'])
+        print(str(board_number) + ") " + boards['meta_description'].replace('&quot;', ' '))
+        board_number += 1
+    board_choose(boards_list)
 
 
-def read_json():
-    with open('4chan.json', 'r') as file:
+def board_choose(board_list):
+    choice = int(input("choose a board from [0-" + str(len(board_list) - 1) + "]: "))
+    get_threads(board_list[choice])
+    global current_board
+    current_board = board_list[choice]
+
+
+def read_json(json_name):
+    with open(json_name, 'r') as file:
         data = file.read()
     obj = json.loads(data)
     return obj
@@ -24,7 +65,8 @@ def read_json():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    get_api()
+    get_boards()
     list_boards()
+    list_threads()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
