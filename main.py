@@ -23,27 +23,33 @@ def get_catalog(board):
 
 def list_threads():
     data = read_json("4chan_catalog.json")
-    thread_list = []
     for catalog in data:
         for thread in catalog['threads']:
             try:
                 print("No." + str(thread['no']))
             except KeyError:
-                print("no number")
+                print("<no number>")
+
+            try:
+                # print(thread['filename'] + thread['ext'])
+                print("https://i.4cdn.org/" + current_board + "/" + str(thread['tim']) + thread['ext'])
+            except KeyError:
+                print("<no file>")
 
             try:
                 print(str(thread['sub']))
             except KeyError:
-                print("no subject")
+                print("<no subject>")
 
             try:
                 h = html2text.HTML2Text()
                 print(h.handle(thread['com']))
             except KeyError:
-                print("no com")
+                print("<no comment>")
 
             for width in range(os.get_terminal_size()[0]):
                 print("-", end='')
+
 
 '''
     for posts in thread_list:
