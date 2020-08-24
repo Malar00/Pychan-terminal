@@ -2,11 +2,12 @@ import requests
 import json
 import os
 import html2text
-from datetime import datetime
 
+# Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
 
 
+# Downloads an json files with boards info. Can be used only once.
 def get_boards():
     response = requests.get('https://a.4cdn.org/boards.json')
     response_json = response.json()
@@ -14,6 +15,7 @@ def get_boards():
         json.dump(response_json, file)
 
 
+# Downloads a catalog of threads on the current_board as a json file.
 def get_catalog(board):
     response = requests.get('https://a.4cdn.org/' + board + '/catalog.json')
     response_json = response.json()
@@ -21,6 +23,7 @@ def get_catalog(board):
         json.dump(response_json, file)
 
 
+# Lists threads on the chosen board from 4chan_catalog.json downloaded by get_catalog().
 def list_threads():
     data = read_json("4chan_catalog.json")
     for catalog in data:
@@ -30,52 +33,31 @@ def list_threads():
             except KeyError:
                 print("<no number>")
 
+            # Combines time of the post and the file format to get image ID.
             try:
-                # print(thread['filename'] + thread['ext'])
                 print("https://i.4cdn.org/" + current_board + "/" + str(thread['tim']) + thread['ext'])
             except KeyError:
                 print("<no file>")
 
+            # Prints title of the thread
             try:
                 print(str(thread['sub']))
             except KeyError:
                 print("<no subject>")
 
+            # Prints body of the thread and converts html to plaintext
             try:
                 h = html2text.HTML2Text()
                 print(h.handle(thread['com']))
             except KeyError:
                 print("<no comment>")
 
+            # Threads borders
             for width in range(os.get_terminal_size()[0]):
                 print("-", end='')
 
 
-'''
-    for posts in thread_list:
-        for post in posts.json()['posts']:
-            if 'unique_ips' in post:
-                try:
-                    print(str(post['no']))
-                except KeyError:
-                    print("no number")
-
-                try:
-                    print("[ replies : " + str(post['unique_ips']) + " ]")
-                except KeyError:
-                    print("not a thread")
-
-                try:
-                    h = html2text.HTML2Text()
-                    print(h.handle(post['com']))
-                except KeyError:
-                    print("no com")
-
-                for width in range(os.get_terminal_size()[0]):
-                    print("-", end='')
-'''
-
-
+# Lists boards and their full description from 4chan_boards.json downloaded by get_boards().
 def list_boards():
     data = read_json("4chan_boards.json")
     board_number = 0
@@ -87,6 +69,7 @@ def list_boards():
     board_choose(boards_list)
 
 
+# User interaction to choose the board for further action.
 def board_choose(board_list):
     choice = int(input("choose a board from [0-" + str(len(board_list) - 1) + "]: "))
     get_catalog(board_list[choice])
@@ -94,6 +77,7 @@ def board_choose(board_list):
     current_board = board_list[choice]
 
 
+# Json file parsing shared by other functions
 def read_json(json_name):
     with open(json_name, 'r') as file:
         data = file.read()
@@ -101,10 +85,7 @@ def read_json(json_name):
     return obj
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     get_boards()
     list_boards()
     list_threads()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
