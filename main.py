@@ -33,17 +33,17 @@ def list_threads():
             except KeyError:
                 print("<no number>")
 
-            # Combines time of the post and the file format to get image ID.
-            try:
-                print("https://i.4cdn.org/" + current_board + "/" + str(thread['tim']) + thread['ext'])
-            except KeyError:
-                print("<no file>")
-
             # Prints title of the thread
             try:
                 print(str(thread['sub']))
             except KeyError:
                 print("<no subject>")
+
+            # Combines time of the post and the file format to get image ID.
+            try:
+                print("https://i.4cdn.org/" + current_board + "/" + str(thread['tim']) + thread['ext'])
+            except KeyError:
+                print("<no file>")
 
             # Prints body of the thread and converts html to plaintext
             try:
@@ -55,6 +55,8 @@ def list_threads():
             # Threads borders
             for width in range(os.get_terminal_size()[0]):
                 print("-", end='')
+            input()
+            os.system("clear")
 
 
 # Lists boards and their full description from 4chan_boards.json downloaded by get_boards().
@@ -62,14 +64,20 @@ def list_boards():
     data = read_json("4chan_boards.json")
     board_number = 0
     boards_list = []
+    boards_list_title = []
     for boards in data['boards']:
         boards_list.append(boards['board'])
-        print(str(board_number) + ") " + boards['meta_description'].replace('&quot;', ' '))
+        boards_list_title.append(str(board_number) + ") " + boards['title'])
         board_number += 1
+    i = 0
+    while i < len(boards_list_title) - 1:
+        print("%-30s %s" % (boards_list_title[i], boards_list_title[i + 1]))
+        i += 2
     board_choose(boards_list)
 
+    # User interaction to choose the board for further action.
 
-# User interaction to choose the board for further action.
+
 def board_choose(board_list):
     choice = int(input("choose a board from [0-" + str(len(board_list) - 1) + "]: "))
     get_catalog(board_list[choice])
@@ -86,6 +94,10 @@ def read_json(json_name):
 
 
 if __name__ == '__main__':
-    get_boards()
-    list_boards()
-    list_threads()
+    try:
+        get_boards()
+        list_boards()
+        list_threads()
+    except KeyboardInterrupt:
+        print("<----------exiting---------->")
+        exit()
