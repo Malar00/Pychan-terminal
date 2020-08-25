@@ -61,10 +61,13 @@ def list_threads():
                 h = html2text.HTML2Text()
                 text = h.handle(thread['com'])
                 print(text.replace(">", BColors.WARNING + ">").replace("\n", BColors.ENDC + "\n"))
-
-
             except KeyError:
                 print("<no comment>")
+
+            try:
+                print("Replies: " + str(thread['replies']) + " | Images: " + str(thread['images']))
+            except KeyError:
+                print("<no replies or images>")
 
             # Threads borders
             for width in range(os.get_terminal_size()[0]):
