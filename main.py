@@ -7,6 +7,17 @@ import html2text
 current_board = "g"
 
 
+class BColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 # Downloads an json files with boards info. Can be used only once.
 def get_boards():
     response = requests.get('https://a.4cdn.org/boards.json')
@@ -29,7 +40,7 @@ def list_threads():
     for catalog in data:
         for thread in catalog['threads']:
             try:
-                print("No." + str(thread['no']))
+                print(BColors.HEADER + "No." + str(thread['no']) + BColors.ENDC)
             except KeyError:
                 print("<no number>")
 
@@ -48,7 +59,10 @@ def list_threads():
             # Prints body of the thread and converts html to plaintext
             try:
                 h = html2text.HTML2Text()
-                print(h.handle(thread['com']))
+                text = h.handle(thread['com'])
+                print(text.replace(">", BColors.WARNING + ">").replace("\n", BColors.ENDC + "\n"))
+
+
             except KeyError:
                 print("<no comment>")
 
