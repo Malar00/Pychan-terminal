@@ -37,46 +37,65 @@ def get_catalog(board):
 # Lists threads on the chosen board from 4chan_catalog.json downloaded by get_catalog().
 def list_threads():
     data = read_json("4chan_catalog.json")
+    numbers, title, image, text, replies = [], [], [], [], []
     for catalog in data:
         for thread in catalog['threads']:
             try:
-                print(BColors.HEADER + "No." + str(thread['no']) + BColors.ENDC)
+                numbers.append(BColors.HEADER + "No." + str(thread['no']) + BColors.ENDC)
             except KeyError:
-                print("<no number>")
+                numbers.append("<no number>")
 
             # Prints title of the thread
             try:
-                print(str(thread['sub']))
+                title.append(str(thread['sub']))
             except KeyError:
-                print("<no subject>")
+                title.append("<no subject>")
 
             # Combines time of the post and the file format to get image ID.
             try:
-                print("https://i.4cdn.org/" + current_board + "/" + str(thread['tim']) + thread['ext'])
+                image.append("https://i.4cdn.org/" + current_board + "/" + str(thread['tim']) + thread['ext'])
             except KeyError:
-                print("<no file>")
+                image.append("<no file>")
 
             # Prints body of the thread and converts html to plaintext
             try:
                 h = html2text.HTML2Text()
-                h.body_width = int(os.get_terminal_size()[0])-1
-                text = h.handle(thread['com'])
-                print(text.replace(">", BColors.WARNING + ">").replace("\n", BColors.ENDC + "\n"))
+                h.body_width = int(os.get_terminal_size()[0]) - 1
+                comment = h.handle(thread['com'])
+                text.append(comment.replace(">", BColors.WARNING + ">").replace("\n", BColors.ENDC + "\n"))
                 # print(thread['com'])
             except KeyError:
-                print("<no comment>")
+                text.append("<no comment>")
 
             # Prints number of replies and images
             try:
-                print("Replies: " + str(thread['replies']) + " | Images: " + str(thread['images']))
+                replies.append("Replies: " + str(thread['replies']) + " | Images: " + str(thread['images']))
             except KeyError:
-                print("<no replies or images>")
+                replies.append("<no replies or images>")
 
-            # Threads borders
-            for width in range(os.get_terminal_size()[0]):
-                print("-", end='')
-            input()
-            os.system("clear")
+        browse_boards(numbers, title, image, text, replies)
+
+
+def browse_boards(numbers, title, image, text, replies):
+    i = 0
+    while i < len(numbers) - 1:
+        os.system("clear")
+        print(i)
+        print(numbers[i])
+        print(title[i])
+        print(image[i])
+        print(text[i])
+        print(replies[i])
+
+        # Threads borders
+        for width in range(os.get_terminal_size()[0]):
+            print("-", end='')
+
+        x = input("go back: q+Return | go forward: e+Return \n")
+        if x == 'q' and i > 0:
+            i -= 1
+        elif x == 'e' and i < len(numbers) - 1:
+            i += 1
 
 
 # Lists boards and their full description from 4chan_boards.json downloaded by get_boards().
