@@ -59,11 +59,14 @@ def list_threads():
             # Prints body of the thread and converts html to plaintext
             try:
                 h = html2text.HTML2Text()
+                h.body_width = int(os.get_terminal_size()[0])-1
                 text = h.handle(thread['com'])
                 print(text.replace(">", BColors.WARNING + ">").replace("\n", BColors.ENDC + "\n"))
+                # print(thread['com'])
             except KeyError:
                 print("<no comment>")
 
+            # Prints number of replies and images
             try:
                 print("Replies: " + str(thread['replies']) + " | Images: " + str(thread['images']))
             except KeyError:
