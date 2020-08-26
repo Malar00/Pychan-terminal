@@ -6,6 +6,9 @@ import html2text
 # Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
 
+# Global variable to set amount of posts printed in browse_thread()
+amount_of_posts = 5
+
 
 class BColors:
     HEADER = '\033[95m'
@@ -34,6 +37,11 @@ def get_catalog(board):
         json.dump(response_json, file)
 
 
+def get_posts(op_id):
+    response = requests.get("https://a.4cdn.org/" + current_board + "/thread/" + op_id + ".json")
+    return response.json()
+
+
 # Lists threads on the chosen board from 4chan_catalog.json downloaded by get_catalog().
 def list_threads():
     data = read_json("4chan_catalog.json")
@@ -41,7 +49,7 @@ def list_threads():
     for catalog in data:
         for thread in catalog['threads']:
             try:
-                numbers.append(BColors.HEADER + "No." + str(thread['no']) + BColors.ENDC)
+                numbers.append(str(thread['no']))
             except KeyError:
                 numbers.append("<no number>")
 
@@ -73,15 +81,15 @@ def list_threads():
             except KeyError:
                 replies.append("<no replies or images>")
 
-        browse_boards(numbers, title, image, text, replies)
+        browse_catalog(numbers, title, image, text, replies)
 
 
-def browse_boards(numbers, title, image, text, replies):
+def browse_catalog(numbers, title, image, text, replies):
     i = 0
     while i < len(numbers) - 1:
         os.system("clear")
         print(i)
-        print(numbers[i])
+        print(BColors.HEADER + "No." + str(numbers[i]) + BColors.ENDC)
         print(title[i])
         print(image[i])
         print(text[i])
@@ -91,11 +99,69 @@ def browse_boards(numbers, title, image, text, replies):
         for width in range(os.get_terminal_size()[0]):
             print("-", end='')
 
-        x = input("go back: q+Return | go forward: e+Return \n")
+        x = input("go back: q+Return | go forward: e+Return | browse thread: w+Return\n")
         if x == 'q' and i > 0:
             i -= 1
         elif x == 'e' and i < len(numbers) - 1:
             i += 1
+        elif x == 'w':
+            browse_thread(numbers[i])
+
+
+def browse_thread(thread_number):
+    data = get_posts(thread_number)
+    numbers, title, image, text = [], [], [], []
+    for post in data['posts']:
+        try:
+            numbers.append(BColors.HEADER + "No." + str(post['no']) + BColors.ENDC)
+        except KeyError:
+            print("<no number>")
+
+        # Prints title of the thread
+        try:
+            title.append(str(post['sub']))
+        except KeyError:
+            title.append("<no subject>")
+
+        # Combines time of the post and the file format to get image ID.
+        try:
+            image.append("https://i.4cdn.org/" + current_board + "/" + str(post['tim']) + post['ext'])
+        except KeyError:
+            image.append("<no file>")
+
+        # Prints body of the thread and converts html to plaintext
+        try:
+            h = html2text.HTML2Text()
+            h.body_width = int(os.get_terminal_size()[0]) - 1
+            comment = h.handle(post['com'])
+            text.append(comment.replace(">", BColors.WARNING + ">").replace("\n", BColors.ENDC + "\n"))
+            # print(thread['com'])
+        except KeyError:
+            text.append("<no comment>")
+
+    i = 0
+    global amount_of_posts
+    while i < len(numbers) - 1:
+        os.system("clear")
+        for qwe in range(amount_of_posts):
+            print(i)
+            print(numbers[i])
+            print(title[i])
+            print(image[i])
+            print(text[i])
+            print("--------------")
+            i += 1
+        x = input("go back: q+Return | go forward: e+Return | back to catalog: w+Return\n")
+        if x == 'q' and i == amount_of_posts:
+            i -= amount_of_posts
+        elif x == 'q' and i > amount_of_posts:
+            i -= amount_of_posts + 1
+        elif x == 'e' and i < len(numbers) - 1:
+            i -= amount_of_posts - 1
+        elif x == 'w':
+            break
+        else:
+            i -= amount_of_posts
 
 
 # Lists boards and their full description from 4chan_boards.json downloaded by get_boards().
