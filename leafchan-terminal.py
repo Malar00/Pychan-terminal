@@ -7,7 +7,7 @@ import time
 import pyfiglet
 import pyfiglet.fonts
 
-
+# TODO: argparse to edit global variables
 
 # Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
@@ -18,6 +18,8 @@ amount_of_posts = 4
 # Global variable to point to the download folder
 download_folder_location = "images/"
 
+
+# TODO: get rid of unused
 
 class BColors:
     HEADER = '\033[95m'
@@ -173,6 +175,7 @@ def browse_thread(thread_number):
             i -= amount_of_posts
 
 
+# TODO: filter/colour NSFW boards
 # Lists boards and their full description from 4chan_boards.json downloaded by get_boards().
 def list_boards():
     data = read_json("4chan_boards.json")
