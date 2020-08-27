@@ -2,12 +2,17 @@ import requests
 import json
 import os
 import html2text
+import wget
+import time
 
 # Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
 
 # Global variable to set amount of posts printed in browse_thread()
 amount_of_posts = 4
+
+# Global variable to point to the download folder
+download_folder_location = "images/"
 
 
 class BColors:
@@ -19,6 +24,8 @@ class BColors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    RED = '\033[31m'
+    RESET = '\033[0m'
 
 
 # Downloads an json files with boards info. Can be used only once.
@@ -42,6 +49,7 @@ def get_posts(op_id):
     return response.json()
 
 
+# Converts json keys into arrays to prepare to print into readable format
 def write_posts(data, searchword, numbers, title, image, text, replies):
     for thread in data[searchword]:
         try:
@@ -106,7 +114,29 @@ def browse_catalog(numbers, title, image, text, replies):
         elif x == 'e' and i < len(numbers) - 1:
             i += 1
         elif x == 'w':
+            print("LOADING THREAD")
             browse_thread(numbers[i])
+
+
+def download_images(images):
+    global download_folder_location
+    image_count = len(images)
+    i = 0
+    for image in images:
+        if image != "<no file>":
+            print(str(i) + " / " + str(image_count))
+            image_url = str(image)
+            try:
+                image_filename = wget.download(url=image_url, out=download_folder_location)
+            except UnboundLocalError:
+                os.system("mkdir " + download_folder_location)
+                continue
+            except FileNotFoundError:
+                os.system("mkdir " + download_folder_location)
+                continue
+            print('\nImage Successfully Downloaded: ', image_filename)
+            i += 1
+            time.sleep(1.2)
 
 
 def browse_thread(thread_number):
@@ -117,21 +147,24 @@ def browse_thread(thread_number):
     global amount_of_posts
     while i < len(numbers) - 1:
         os.system("clear")
-        for qwe in range(amount_of_posts):
+        for check in range(amount_of_posts):
             print(i)
-            print(numbers[i])
+            print(BColors.HEADER + "No." + str(numbers[i]) + BColors.ENDC)
             print(title[i])
-            print(image[i])
+            print(BColors.UNDERLINE + image[i] + BColors.ENDC)
             print(text[i])
             print_border()
             i += 1
-        x = input("go back: q+Return | go forward: e+Return | back to catalog: w+Return\n")
+        x = input(
+            "go back: q+Return | go forward: e+Return | back to catalog: w+Return | download all images: da+Return\n")
         if x == 'q' and i > amount_of_posts:
             i -= amount_of_posts + 1
         elif x == 'e' and i < len(numbers) - 1:
             i -= amount_of_posts - 1
         elif x == 'w':
             break
+        elif x == 'da':
+            download_images(image)
         else:
             i -= amount_of_posts
 
@@ -144,17 +177,19 @@ def list_boards():
     boards_list_title = []
     for boards in data['boards']:
         boards_list.append(boards['board'])
-        boards_list_title.append(str(board_number) + ") " + boards['title'])
+        if boards['ws_board'] == 0:
+            boards_list_title.append(str(board_number) + ") " + boards['title'])
+        else:
+            boards_list_title.append(str(board_number) + ") " + boards['title'])
         board_number += 1
     i = 0
     while i < len(boards_list_title) - 1:
-        print("%-30s %s" % (boards_list_title[i], boards_list_title[i + 1]))
+        print("%-50s%s" % (boards_list_title[i], boards_list_title[i + 1]))
         i += 2
     board_choose(boards_list)
 
-    # User interaction to choose the board for further action.
 
-
+# User interaction to choose the board for further action.
 def board_choose(board_list):
     choice = int(input("choose a board from [0-" + str(len(board_list) - 1) + "]: "))
     get_catalog(board_list[choice])
@@ -182,5 +217,5 @@ if __name__ == '__main__':
         list_boards()
         list_threads()
     except KeyboardInterrupt:
-        print("<----------exiting---------->")
+        print()
         exit()
