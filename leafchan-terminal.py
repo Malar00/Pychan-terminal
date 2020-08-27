@@ -216,8 +216,8 @@ def print_border():
 
 
 def cli():
-    #ascii_banner = pyfiglet.figlet_format("Leafchan\nTerminal")
-    #print(ascii_banner)
+    ascii_banner = pyfiglet.figlet_format("Leafchan\nTerminal")
+    print(ascii_banner)
     get_boards()
     list_boards()
     list_threads()
