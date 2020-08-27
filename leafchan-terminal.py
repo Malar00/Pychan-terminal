@@ -4,6 +4,10 @@ import os
 import html2text
 import wget
 import time
+import pyfiglet
+import pyfiglet.fonts
+
+
 
 # Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
@@ -211,11 +215,17 @@ def print_border():
         print("-", end='')
 
 
+def cli():
+    #ascii_banner = pyfiglet.figlet_format("Leafchan\nTerminal")
+    #print(ascii_banner)
+    get_boards()
+    list_boards()
+    list_threads()
+
+
 if __name__ == '__main__':
     try:
-        get_boards()
-        list_boards()
-        list_threads()
+        cli()
     except KeyboardInterrupt:
         print()
         exit()
