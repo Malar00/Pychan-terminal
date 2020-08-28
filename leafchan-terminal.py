@@ -16,7 +16,7 @@ current_board = "g"
 amount_of_posts = 4
 
 # Global variable to point to the download folder
-download_folder_location = "images/"
+download_folder_location = "images"
 
 
 # TODO: get rid of unused
@@ -145,6 +145,20 @@ def download_images(images):
             time.sleep(1.2)
 
 
+def download_current_image(image):
+    global download_folder_location
+    if image != "<no file>":
+        image_url = str(image)
+        try:
+            image_filename = wget.download(url=image_url, out=download_folder_location)
+        except UnboundLocalError:
+            os.system("mkdir " + download_folder_location)
+        except FileNotFoundError:
+            os.system("mkdir " + download_folder_location)
+        print('\nImage Successfully Downloaded: ', image_filename)
+        time.sleep(2)
+
+
 def browse_thread(thread_number):
     data = get_posts(thread_number)
     numbers, title, image, text, replies = [], [], [], [], []
@@ -162,15 +176,20 @@ def browse_thread(thread_number):
             print_border()
             i += 1
         x = input(
-            "go back: q+Return | go forward: e+Return | back to catalog: w+Return | download all images: da+Return\n")
+            "back: q+Return | forward: e+Return | back to catalog: w+Return | download single: d+Return | download "
+            "all: da+Return\n")
         if x == 'q' and i > amount_of_posts:
             i -= amount_of_posts + 1
-        elif x == 'e' and i < len(numbers) - 1:
+        elif x == 'e' and i < len(numbers):
             i -= amount_of_posts - 1
         elif x == 'w':
             break
+        elif x == 'd':
+            download_current_image(image[i-1])
+            i -= amount_of_posts
         elif x == 'da':
             download_images(image)
+            i -= amount_of_posts
         else:
             i -= amount_of_posts
 
