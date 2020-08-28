@@ -31,7 +31,7 @@ class BColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     RED = '\033[31m'
-    RESET = '\033[0m'
+    RESET = '\033[10m'
 
 
 # Downloads an json files with boards info. Can be used only once.
@@ -194,7 +194,7 @@ def browse_thread(thread_number):
             i -= amount_of_posts
 
 
-# TODO: filter/colour NSFW boards
+# TODO: filter NSFW boards
 # Lists boards and their full description from 4chan_boards.json downloaded by get_boards().
 def list_boards():
     data = read_json("4chan_boards.json")
@@ -204,9 +204,9 @@ def list_boards():
     for boards in data['boards']:
         boards_list.append(boards['board'])
         if boards['ws_board'] == 0:
-            boards_list_title.append(str(board_number) + ") " + boards['title'])
+            boards_list_title.append(BColors.WARNING + str(board_number) + ") " + boards['title'] + BColors.ENDC)
         else:
-            boards_list_title.append(str(board_number) + ") " + boards['title'])
+            boards_list_title.append(BColors.RESET + str(board_number) + ") " + boards['title'] + BColors.ENDC)
         board_number += 1
     i = 0
     while i < len(boards_list_title) - 1:
