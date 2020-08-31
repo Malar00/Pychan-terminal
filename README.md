@@ -13,6 +13,6 @@ $ pip install requests html2text wget pyfiglet
 ## Usage:
 
 ```bash
-$ python Pychan-terminal -p 3 -d images/
+$ python Pychan-terminal -p 4 -d images/
 ```
 
