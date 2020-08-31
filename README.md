@@ -16,3 +16,14 @@ $ pip install requests html2text wget pyfiglet
 $ python Pychan-terminal -p 4 -d images/
 ```
 
+## Help:
+
+```bash
+optional arguments:
+  -h, --help            show this help message and exit
+  -p POSTS, --posts POSTS
+                        change number of posts to show at once. Default: 4
+  -d DIRECTORY, --directory DIRECTORY
+                        change image save directory. Default: images/
+  -b, --banner          compacts the banner into 2 lines
+```
