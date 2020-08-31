@@ -17,14 +17,20 @@ amount_of_posts = 4
 # Global variable to point to the download folder
 download_folder_location = "images/"
 
+# Global variable to change the banner
+ascii_banner = pyfiglet.figlet_format("Pychan Terminal")
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--posts", type=int, help="change number of posts to show at once. Default: 4")
 parser.add_argument("-d", "--directory", type=str, help="change image save directory. Default: images/")
+parser.add_argument("-b", "--banner", action="store_true", help="compacts the banner into 2 lines")
 args = parser.parse_args()
 if args.posts:
     amount_of_posts = args.posts
 if args.directory:
     download_folder_location = args.directory
+if args.banner:
+    ascii_banner = pyfiglet.figlet_format("Pychan\nTerminal")
 
 
 class BColors:
@@ -237,7 +243,7 @@ def print_border():
 
 
 def cli():
-    ascii_banner = pyfiglet.figlet_format("Pychan\nTerminal")
+    global ascii_banner
     print(ascii_banner)
     get_boards()
     list_boards()
