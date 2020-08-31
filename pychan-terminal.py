@@ -8,7 +8,6 @@ import pyfiglet
 import pyfiglet.fonts
 import argparse
 
-
 # Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
 
@@ -28,19 +27,13 @@ if args.directory:
     download_folder_location = args.directory
 
 
-
-# TODO: get rid of unused
-
 class BColors:
     HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-    RED = '\033[31m'
     RESET = '\033[10m'
 
 
