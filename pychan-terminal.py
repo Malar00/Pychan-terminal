@@ -131,9 +131,9 @@ def download_images(images, images_start, images_end):
     global download_folder_location
     image_count, num = 0, images_start
     while num <= images_end:
-        num += 1
         if images[num] != "<no file>":
             image_count += 1
+        num += 1
     i, num = 1, images_start
     while num <= images_end:
         if images[num] != "<no file>":
