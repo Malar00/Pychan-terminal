@@ -16,7 +16,7 @@ current_board = "g"
 amount_of_posts = 4
 
 # Global variable to point to the download folder
-download_folder_location = "images"
+download_folder_location = "images/"
 
 
 # TODO: get rid of unused
@@ -124,14 +124,18 @@ def browse_catalog(numbers, title, image, text, replies):
             browse_thread(numbers[i])
 
 
-def download_images(images):
+def download_images(images, images_start, images_end):
     global download_folder_location
-    image_count = len(images)
-    i = 0
-    for image in images:
-        if image != "<no file>":
+    image_count, num = 0, images_start
+    while num <= images_end:
+        num += 1
+        if images[num] != "<no file>":
+            image_count += 1
+    i, num = 1, images_start
+    while num <= images_end:
+        if images[num] != "<no file>":
             print(str(i) + " / " + str(image_count))
-            image_url = str(image)
+            image_url = str(images[num])
             try:
                 image_filename = wget.download(url=image_url, out=download_folder_location)
             except UnboundLocalError:
@@ -143,20 +147,7 @@ def download_images(images):
             print('\nImage Successfully Downloaded: ', image_filename)
             i += 1
             time.sleep(1.2)
-
-
-def download_current_image(image):
-    global download_folder_location
-    if image != "<no file>":
-        image_url = str(image)
-        try:
-            image_filename = wget.download(url=image_url, out=download_folder_location)
-        except UnboundLocalError:
-            os.system("mkdir " + download_folder_location)
-        except FileNotFoundError:
-            os.system("mkdir " + download_folder_location)
-        print('\nImage Successfully Downloaded: ', image_filename)
-        time.sleep(2)
+        num += 1
 
 
 def browse_thread(thread_number):
@@ -176,20 +167,26 @@ def browse_thread(thread_number):
             print_border()
             i += 1
         x = input(
-            "back: q+Return | forward: e+Return | back to catalog: w+Return | download single: d+Return | download "
-            "all: da+Return\n")
+            "back: q+Return | forward: e+Return | back to catalog: w+Return | download images: d{amount}+Return | "
+            "download all: da+Return\n")
         if x == 'q' and i > amount_of_posts:
             i -= amount_of_posts + 1
         elif x == 'e' and i < len(numbers):
             i -= amount_of_posts - 1
         elif x == 'w':
             break
-        elif x == 'd':
-            download_current_image(image[i-1])
-            i -= amount_of_posts
-        elif x == 'da':
-            download_images(image)
-            i -= amount_of_posts
+        # Download mode
+        elif x[0] == 'd':
+            if len(x) == 1:
+                download_images(image, i - 1, i - 1)
+                i -= amount_of_posts
+            elif x[1] == 'a':
+                download_images(image, 0, len(image) - 1)
+                i -= amount_of_posts
+            elif x[1].isdigit():
+                download_images(image, 0, int(x[1:]) - 1)
+                i -= amount_of_posts
+
         else:
             i -= amount_of_posts
 
