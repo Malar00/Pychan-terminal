@@ -6,8 +6,8 @@ import wget
 import time
 import pyfiglet
 import pyfiglet.fonts
+import argparse
 
-# TODO: argparse to edit global variables
 
 # Global variable to share the current board for image and catalog fetch. Defaults to /g/ ofc
 current_board = "g"
@@ -17,6 +17,16 @@ amount_of_posts = 4
 
 # Global variable to point to the download folder
 download_folder_location = "images/"
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--posts", type=int, help="change number of posts to show at once. Default: 4")
+parser.add_argument("-d", "--directory", type=str, help="change image save directory. Default: images/")
+args = parser.parse_args()
+if args.posts:
+    amount_of_posts = args.posts
+if args.directory:
+    download_folder_location = args.directory
+
 
 
 # TODO: get rid of unused
@@ -186,7 +196,6 @@ def browse_thread(thread_number):
             elif x[1].isdigit():
                 download_images(image, 0, int(x[1:]) - 1)
                 i -= amount_of_posts
-
         else:
             i -= amount_of_posts
 
